@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "module": "es6",
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "es5",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "paths": {
+      "*": ["src/*"]
+    }
   },
-  "lib": ["es2015"]
+  "include": ["**/*.ts", "**/*.tsx", "src"],
+  "exclude": ["node_modules"]
 }

@@ -6,34 +6,35 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  mode: 'production',
   entry: {
     background: {
-      import: './src/background',
+      import: './src/background/index.ts',
       filename: 'background.js',
     },
     options: {
-      import: './src/options',
+      import: './src/options/index.ts',
       filename: 'options.js',
     },
     popup: {
-      import: './src/popup',
+      import: './src/popup/index.tsx',
       filename: 'popup.js',
     }
+  },
+  resolve: {
+    extensions: ['.js', '.ts', '.tsx'],
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
   },
   module: {
     rules: [
       {
-        test: /\.tsx?S/,
+        test: /\.(ts|tsx)$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
     ],
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
     new HtmlWebpackPlugin({
