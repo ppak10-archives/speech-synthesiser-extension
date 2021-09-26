@@ -1,14 +1,13 @@
 /**
- * index.ts
- * Entry file for popup application.
+ * index.tsx
+ * Entry file for extension popup application.
  */
 
 // Node Modules
 import {render} from 'react-dom';
 
-const App = () => (
- <div>Hello world</div>
-);
+// Components
+import App from './App';
 
 render(
   <App />,
