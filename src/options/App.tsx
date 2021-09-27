@@ -1,6 +1,6 @@
 /**
  * App.tsx
- * React app component
+ * App component for extension options page.
  */
 
 // Node Modules
@@ -52,7 +52,7 @@ const App: FC = () => {
 
   return (
     <div>
-      <h1>Speech Synthesis</h1>
+      <h1>Voices</h1>
       <form onSubmit={handleSubmit}>
         <input value={text} onChange={handleTextChange} />
         <select onChange={handleVoiceChange} value={voiceName}>

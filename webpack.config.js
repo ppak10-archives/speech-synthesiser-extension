@@ -9,16 +9,13 @@ module.exports = {
   mode: 'production',
   entry: {
     background: {
-      import: './src/background/index.ts',
-      filename: 'background.js',
+      import: './src/background',
     },
     options: {
-      import: './src/options/index.ts',
-      filename: 'options.js',
+      import: './src/options',
     },
     popup: {
-      import: './src/popup/index.tsx',
-      filename: 'popup.js',
+      import: './src/popup',
     }
   },
   resolve: {

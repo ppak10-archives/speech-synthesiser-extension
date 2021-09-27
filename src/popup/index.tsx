@@ -9,10 +9,7 @@ import {render} from 'react-dom';
 // Components
 import App from './App';
 
-render(
-  <App />,
-  document.getElementById('popup-root'),
-);
+render(<App />, document.getElementById('root'));
 
 // let changeColor = document.getElementById("changeColor");
 
