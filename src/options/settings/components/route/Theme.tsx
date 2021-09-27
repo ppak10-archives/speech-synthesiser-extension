@@ -8,7 +8,7 @@ import { FC } from 'react';
 
 const Theme: FC = () => (
   <div>
-    Theme
+    <h1>Theme Settings</h1>
   </div>
 );
 

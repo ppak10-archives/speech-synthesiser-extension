@@ -20,9 +20,6 @@ const StyledNav = styled.nav`
 
   ul {
     display: flex;
-    list-style: none;
-    margin: 0px;
-    padding: 0px;
   }
 `;
 
