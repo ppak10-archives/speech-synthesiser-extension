@@ -9,7 +9,16 @@ import {render} from 'react-dom';
 // Components
 import App from './App';
 
-render(<App />, document.getElementById('root'));
+// Styled
+import {GlobalStyle} from 'common/styled';
+
+render(
+  <>
+    <GlobalStyle />
+    <App />
+  </>,
+  document.getElementById('root')
+);
 
 // let page = document.getElementById("buttonDiv");
 // let selectedClassName = "current";

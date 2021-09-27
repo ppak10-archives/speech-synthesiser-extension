@@ -4,64 +4,53 @@
  */
 
 // Node Modules
-import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
+import { FC } from 'react';
+import { MemoryRouter as Router, Link, Route, Switch } from 'react-router-dom';
+import styled, { ThemeProvider } from 'styled-components';
 
-const synth = window.speechSynthesis;
+// Components
+import SettingsPage from './settings/components/SettingsPage';
 
-const App: FC = () => {
-  // Hooks
-  const [voices, setVoices] = useState([]);
-  const [voiceName, setVoiceName] = useState(null);
-  const [text, setText] = useState('');
+// Config
+import {THEME} from 'config';
 
-  useEffect(() => {
-    setVoices(synth.getVoices());
-  }, []);
+// Styled Components
+const StyledNav = styled.nav`
+  background-color: ${({theme}) => theme.color.primary};
 
-  useEffect(() => {
-    chrome.storage.sync.get('voiceName', ({ voiceName }) => {
-      console.log('voiceName', voiceName)
-      setVoiceName(voiceName);
-    })
-  }, []);
+  ul {
+    display: flex;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+  }
+`;
 
-  // Callbacks
-  const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setText(value);
-  };
+const Home: FC = () => (
+  <div>
+    Home
+  </div>
+);
 
-  const handleVoiceChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const { value } = e.target;
-    setVoiceName(value);
-    chrome.storage.sync.set({ voiceName: value });
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.voice = voices.find((voice) => voice.name === voiceName);
-    console.log('voice', utter.voice)
-    synth.speak(utter);
-  };
-
-  // JSX
-  const voiceOptionsJSX = voices.map((voice) => (
-    <option key={voice.name} value={voice.name}>{voice.name}</option>
-  ));
-
-  return (
-    <div>
-      <h1>Voices</h1>
-      <form onSubmit={handleSubmit}>
-        <input value={text} onChange={handleTextChange} />
-        <select onChange={handleVoiceChange} value={voiceName}>
-          {voiceOptionsJSX}
-        </select>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
-  )
-};
+const App: FC = () => (
+  <ThemeProvider theme={THEME}>
+    <Router>
+      <StyledNav>
+        <ul>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/settings/speech">Settings</Link>
+          </li>
+        </ul>
+      </StyledNav>
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route path="/settings" component={SettingsPage} />
+      </Switch>
+    </Router>
+  </ThemeProvider>
+);
 
 export default App;

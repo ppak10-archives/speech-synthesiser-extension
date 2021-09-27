@@ -20,6 +20,9 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],
+
+    // Allows for typescript module resolution.
+    modules: ['node_modules', 'src'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
