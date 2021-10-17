@@ -4,24 +4,31 @@
  */
 
 // Node Modules
+import { MemoryHistory } from 'history';
 import { FC } from 'react';
-import { MemoryRouter as Router, Link, Route, Switch } from 'react-router-dom';
-import styled, { ThemeProvider } from 'styled-components';
+import { MemoryRouter as Router, Route, Switch } from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
 
 // Components
+import Navbar from './router/components/Navbar';
 import SettingsPage from './settings/components/SettingsPage';
 
 // Config
 import {THEME} from 'config';
 
-// Styled Components
-const StyledNav = styled.nav`
-  background-color: ${({theme}) => theme.color.primary};
+// Utils
+const getPartialMemoryHistory = (): Partial<MemoryHistory> => {
+  const partialMemoryHistory = sessionStorage.getItem('partial_memory_history');
 
-  ul {
-    display: flex;
+  if (partialMemoryHistory) {
+    return JSON.parse(partialMemoryHistory);
   }
-`;
+
+  return {
+    entries: undefined,
+    index: undefined,
+  };
+}
 
 const Home: FC = () => (
   <div>
@@ -29,25 +36,23 @@ const Home: FC = () => (
   </div>
 );
 
-const App: FC = () => (
-  <ThemeProvider theme={THEME}>
-    <Router>
-      <StyledNav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/settings/speech">Settings</Link>
-          </li>
-        </ul>
-      </StyledNav>
-      <Switch>
-        <Route exact path="/" component={Home} />
-        <Route path="/settings" component={SettingsPage} />
-      </Switch>
-    </Router>
-  </ThemeProvider>
-);
+const App: FC = () => {
+  const partialMemoryHistory = getPartialMemoryHistory();
+
+  return (
+    <ThemeProvider theme={THEME}>
+      <Router
+        initialEntries={partialMemoryHistory.entries}
+        initialIndex={partialMemoryHistory.index}
+      >
+        <Navbar />
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/settings" component={SettingsPage} />
+        </Switch>
+      </Router>
+    </ThemeProvider>
+  );
+}
 
 export default App;

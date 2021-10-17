@@ -6,7 +6,11 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  mode: 'production',
+
+  // https://stackoverflow.com/a/49100966/10521456
+  devtool: 'cheap-module-source-map',
+
+  mode: 'development',
   entry: {
     background: {
       import: './src/background',
