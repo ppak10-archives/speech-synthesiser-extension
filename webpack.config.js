@@ -12,8 +12,8 @@ module.exports = {
 
   mode: 'development',
   entry: {
-    content_scripts: {
-      import: './src/content_scripts',
+    content: {
+      import: './src/content',
     },
     background: {
       import: './src/background',

@@ -8,7 +8,7 @@
   },
   "content_scripts": [{
     "matches": ["<all_urls>"],
-    "js": ["dist/content_scripts.js"]
+    "js": ["dist/content.js"]
   }],
   "permissions": ["activeTab", "contextMenus", "scripting", "storage"],
   "action": {
