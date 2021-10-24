@@ -2,8 +2,10 @@
  * webpack.config.js
  */
 
+const dotenv =  require('dotenv');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
 
@@ -53,6 +55,9 @@ module.exports = {
       filename: 'options.html',
       template: 'src/options/index.html',
       chunks: ['options']
-    })
+    }),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(dotenv.config().parsed),
+    }),
   ]
 };
