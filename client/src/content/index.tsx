@@ -23,7 +23,7 @@ const synthesize = async (text) => {
 
   if (response.status === 200) {
     const data = await response.json();
-    const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
+    const audio = new Audio('data:audio/mp3;base64,' + data.audio_content);
     audio.play();
   }
 };
