@@ -13,8 +13,11 @@ const synthesize = async (text) => {
       text,
     }
   }
-  const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${process.env.GOOGLE_API_KEY}`, {
+  const response = await fetch(`http://localhost:5000/synthesize`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(request),
   });
 
