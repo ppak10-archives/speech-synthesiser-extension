@@ -38,7 +38,7 @@ const handleMenuItemClick = (info: chrome.contextMenus.OnClickData) => {
 }
 
 const setUpContextMenus = () => {
-  // This context menu item only appears when text is highlighted.
+  // This context menu item only appears when text is highlighted by user.
   chrome.contextMenus.create({
     id: MenuItemId.ReadSelection,
     title: 'Read Selection',

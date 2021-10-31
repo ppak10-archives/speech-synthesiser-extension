@@ -1,0 +1,30 @@
+/**
+ * index.css
+ * Styles used on host dom nodes, react app is styled using styled-components.
+ */
+
+.speakeasy-hover-text {
+  background-color: lightyellow;
+  border-radius: 2px;
+  box-shadow: inset 0px 0px 1px 1px lightgray;
+  /* animation: colorchange 5s infinite !important; */
+}
+
+.speakeasy-active-text {
+  background-color: lightgreen;
+  border-radius: 2px;
+  box-shadow: inset 0px 0px 1px 1px lightgray;
+  /* animation: colorchange 5s infinite !important; */
+}
+
+@keyframes colorchange {
+  0% {
+    background-color: yellow;
+  }
+  50% {
+    background-color: orange;
+  }
+  100% {
+    background-color: yellow;
+  }
+}

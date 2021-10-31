@@ -14,6 +14,7 @@ console.log('Added content_scripts')
 // Injects `div` element into document to utilize as root for react app.
 const root = document.createElement('div');
 root.setAttribute('id', 'speakeasy-root');
-document.body.appendChild(root);
 
+document.body.appendChild(root);
 render(<App />, root)
+

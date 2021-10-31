@@ -2,6 +2,7 @@
  * webpack.config.js
  */
 
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const dotenv =  require('dotenv');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -46,6 +47,14 @@ module.exports = {
     ],
   },
   plugins: [
+    // Used mainly to copy content script css to dist folder.
+    // May look into using something like css-loader if styles get more complex.
+    new CopyWebpackPlugin({
+      patterns: [{
+        from: path.resolve(__dirname, 'src/content/index.css'),
+        to: path.resolve(__dirname, 'dist/content.css'),
+      }],
+    }),
     new HtmlWebpackPlugin({
       filename: 'popup.html',
       template: 'src/popup/index.html',

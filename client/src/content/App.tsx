@@ -4,31 +4,70 @@
  */
 
 // Node Modules
-import { FC, useEffect, useState } from 'react';
+import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+
+// Constants
+const BORDER_RADIUS = '2px';
 
 // Enums
 import { MessageType } from 'background/enums';
 
 // Styled Components
-const StyledApp = styled.div<StyledAppProps>`
-  background-color: white;
-  display: ${({ innerText }) => innerText === null ? 'none' : 'flex'};
+const StyledOutline = styled.div.attrs<StyledOutlineProps>(({ style }) => ({
+  style,
+}))<StyledOutlineProps>`
+  background-color: rgba(0, 0, 0, 0.1);
+
+  /**
+   * Uses pointer-events as none here to handle proper hovering of content using
+   * document wide 'mouseover' event listener.
+   */
+  pointer-events: none;
+
   position: absolute;
-  top: 0px;
-  left: 0px;
-  overflow: scroll;
-  height: 500px;
-  width: 500px;
-  z-index: 999999;
+  transition: 250ms;
+  z-index: 99999999;
 `;
 
 // Types
-interface StyledAppProps {
-  innerText: string;
+interface StyledOutlineProps {
+  style: CSSProperties;
 }
 
 // Utils
+import { NodeSelection } from './utils';
+const createOutlineHoverStyles = (target: HTMLElement): CSSProperties => {
+  const computedStyle = window.getComputedStyle(target);
+
+  // Applies all values in computed styles if any are not '0px'
+  const hasRadius = [
+    'borderBottomLeftRadius',
+    'borderBottomRightRadius',
+    'borderTopLeftRadius',
+    'borderTopRightRadius',
+  ].find((key) => computedStyle[key] !== '0px');
+
+  const clientRect = target.getBoundingClientRect();
+
+  return {
+    // Border styles
+    borderBottomLeftRadius: hasRadius ? computedStyle.borderBottomLeftRadius : BORDER_RADIUS,
+    borderBottomRightRadius: hasRadius ? computedStyle.borderBottomRightRadius : BORDER_RADIUS,
+    borderTopLeftRadius: hasRadius ? computedStyle.borderTopLeftRadius : BORDER_RADIUS,
+    borderTopRightRadius: hasRadius ? computedStyle.borderTopRightRadius : BORDER_RADIUS,
+
+    // Styles associated with positioning  (`scrollX` & `scrollY`)
+    // https://javascript.info/coordinates#getCoords
+    bottom: clientRect.bottom + window.scrollY,
+    height: clientRect.height,
+    left: clientRect.left + window.scrollX,
+    right: clientRect.right + window.scrollX,
+    top: clientRect.top + window.scrollY,
+    width: clientRect.width,
+  };
+};
+
 const synthesize = async (text) => {
   const request = {
     audioConfig: {
@@ -57,32 +96,37 @@ const synthesize = async (text) => {
   }
 };
 
-const styleNodeValue = (node) => {
-  if (node.nodeValue) {
-    node.parentNode.setAttribute('style', 'box-shadow: 0px 0px 5px 5px red;')
-  }
-  if (node.childNodes) {
-    node.childNodes.forEach((childNode) => {
-      styleNodeValue(childNode)
-    });
-  }
-};
-
-const unstyleNodeValue = (node) => {
-  if (node.nodeValue) {
-    node.parentNode.removeAttribute('style')
-  }
-  if (node.childNodes) {
-    node.childNodes.forEach((childNode) => {
-      unstyleNodeValue(childNode)
-    });
-  }
-};
-
 const App: FC = () => {
   // Hooks
-  const [innerText, setInnerText] = useState(null);
+  const outlineActiveDomNodeRef = useRef(null);
+  const outlineHoverDomNodeRef = useRef(null);
   const [selectFromPage, setSelectFromPage] = useState(false);
+
+  const [outlineActiveStyle, setOutlineActiveStyle] = useState<CSSProperties>({
+    borderBottomLeftRadius: null,
+    borderBottomRightRadius: null,
+    borderTopLeftRadius: null,
+    borderTopRightRadius: null,
+    bottom: null,
+    height: null,
+    left: null,
+    right: null,
+    top: null,
+    width: null,
+  });
+
+  const [outlineHoverStyle, setOutlineHoverStyle] = useState<CSSProperties>({
+    borderBottomLeftRadius: null,
+    borderBottomRightRadius: null,
+    borderTopLeftRadius: null,
+    borderTopRightRadius: null,
+    bottom: null,
+    height: null,
+    left: null,
+    right: null,
+    top: null,
+    width: null,
+  });
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message) => {
@@ -97,28 +141,53 @@ const App: FC = () => {
   }, []);
 
   useEffect(() => {
+    const nodeSelectionHover = new NodeSelection('speakeasy-hover-text');
+    const nodeSelectionActive = new NodeSelection('speakeasy-active-text');
+
     const handleMouseOver = (e: MouseEvent) => {
       if (selectFromPage) {
-        (e.relatedTarget as HTMLElement).removeAttribute('style');
-        (e.target as HTMLElement).setAttribute('style', 'background-color: cornflowerblue;');
-        setInnerText((e.target as HTMLElement).innerText);
-        unstyleNodeValue(e.relatedTarget);
-        styleNodeValue(e.target);
+
+        nodeSelectionHover.unstyle(e.relatedTarget);
+
+        nodeSelectionHover.style(e.target)
+        outlineHoverDomNodeRef.current = e.target;
+
+        // Sets absolute position for outline hover.
+        setOutlineHoverStyle(createOutlineHoverStyles(e.target as HTMLElement));
       }
     };
 
+    const handleClick = (e: MouseEvent) => {
+      if (selectFromPage) {
+        // Prevents elements like links from redirecting and some buttons.
+        // Doesn't seem to catch events from <svg />.
+        e.preventDefault();
+
+        nodeSelectionActive.unstyle(outlineActiveDomNodeRef.current);
+        nodeSelectionHover.unstyle(e.target);
+
+        nodeSelectionActive.style(e.target);
+        outlineActiveDomNodeRef.current = e.target;
+        setOutlineActiveStyle(createOutlineHoverStyles(e.target as HTMLElement));
+      }
+    }
+
+    document.addEventListener('click', handleClick);
     document.addEventListener('mouseover', handleMouseOver);
 
     return () => {
+      document.removeEventListener('click', handleClick);
       document.removeEventListener('mouseover', handleMouseOver);
     };
   }, [selectFromPage]);
 
   return (
-    <StyledApp innerText={innerText}>
-      {innerText}
-    </StyledApp>
+    <>
+      <StyledOutline style={outlineHoverStyle} />
+      <StyledOutline style={outlineActiveStyle} />
+    </>
   );
 }
 
 export default App;
+
