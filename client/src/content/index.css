@@ -10,8 +10,15 @@
   /* animation: colorchange 5s infinite !important; */
 }
 
-.speakeasy-active-text {
+.speakeasy-text-insert {
   background-color: lightgreen;
+  border-radius: 2px;
+  box-shadow: inset 0px 0px 1px 1px lightgray;
+  /* animation: colorchange 5s infinite !important; */
+}
+
+.speakeasy-text-delete {
+  background-color: lightcoral;
   border-radius: 2px;
   box-shadow: inset 0px 0px 1px 1px lightgray;
   /* animation: colorchange 5s infinite !important; */
