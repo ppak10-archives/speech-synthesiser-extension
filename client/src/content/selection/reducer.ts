@@ -6,16 +6,19 @@
 import { createReducer } from '@reduxjs/toolkit';
 
 // Actions
-import { setIsSelecting } from './actions';
+import { setEditorStatus } from './actions';
+
+// Enums
+import { SelectionEditorStatus } from './enum';
 
 const INITIAL_STATE = {
-  isSelecting: false,
+  editorStatus: SelectionEditorStatus.Idle,
 };
 
 const reducer = createReducer(INITIAL_STATE, (builder) => {
   builder
-    .addCase(setIsSelecting, (state, action) => {
-      state.isSelecting = action.payload.isSelecting;
+    .addCase(setEditorStatus, (state, action) => {
+      state.editorStatus = action.payload.editorStatus;
     })
 });
 

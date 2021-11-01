@@ -7,13 +7,14 @@
 import { FC, useEffect } from 'react';
 
 // Actions
-import { setIsSelecting } from './selection/actions';
+import { setEditorStatus } from './selection/actions';
 
 // Components
 import SelectionEditor from './selection/components/Editor';
 
 // Enums
 import { MessageType } from 'background/enums';
+import { SelectionEditorStatus } from 'content/selection/enum';
 
 // Hooks
 import { useAppDispatch } from 'content/hooks';
@@ -32,7 +33,7 @@ const App: FC = () => {
           synthesize(message.payload.selectionText);
           break;
         case MessageType.ToggleSelectFromPage:
-          dispatch(setIsSelecting(true));
+          dispatch(setEditorStatus(SelectionEditorStatus.Selecting));
       }
     });
   }, [dispatch]);

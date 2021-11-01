@@ -5,18 +5,36 @@
 
 // Node Modules
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
+
+// Actions
+import { setEditorStatus } from '../actions';
 
 // Constants
 const BORDER_RADIUS = '2px';
 
+// Enums
+import { SelectionEditorStatus } from '../enum';
+
 // Hooks
-import { useAppSelector } from 'content/hooks';
+import { useAppDispatch, useAppSelector } from 'content/hooks';
 
 // Styled Components
 import { StyledBackground } from './Background';
+const StyledCancelButton = styled.button`
+  background-color: red;
+  border-radius: ${BORDER_RADIUS};
+  pointer-events: all;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+`;
 
 // Utils
 import { NodeSelection } from '../utils';
+
+const nodeSelectionHover = new NodeSelection('speakeasy-hover-text');
+const nodeSelectionActive = new NodeSelection('speakeasy-text-insert');
 
 const createOutlineHoverStyles = (target: HTMLElement): CSSProperties => {
   const computedStyle = window.getComputedStyle(target);
@@ -51,9 +69,10 @@ const createOutlineHoverStyles = (target: HTMLElement): CSSProperties => {
 
 const Editor: FC = () => {
   // Hooks
-  const backgroundActiveDomNodeRef = useRef(null);
-  const backgroundHoverDomNodeRef = useRef(null);
-  const isSelecting = useAppSelector(({ selection }) => selection.isSelecting);
+  const dispatch = useAppDispatch();
+  const activeDomNodeRef = useRef(null);
+  const hoverDomNodeRef = useRef(null);
+  const editorStatus = useAppSelector(({ selection }) => selection.editorStatus);
 
   const [backgroundActiveStyle, setBackgroundActiveStyle] = useState<CSSProperties>({
     borderBottomLeftRadius: null,
@@ -81,17 +100,21 @@ const Editor: FC = () => {
     width: null,
   });
 
+  // Callbacks
+  const handleCancelButonClick = () => {
+    dispatch(setEditorStatus(SelectionEditorStatus.Selecting));
+    nodeSelectionActive.unstyle(activeDomNodeRef.current);
+  };
+
   useEffect(() => {
-    const nodeSelectionHover = new NodeSelection('speakeasy-hover-text');
-    const nodeSelectionActive = new NodeSelection('speakeasy-active-text');
 
     const handleMouseOver = (e: MouseEvent) => {
-      if (isSelecting) {
+      if (editorStatus === SelectionEditorStatus.Selecting) {
 
         nodeSelectionHover.unstyle(e.relatedTarget);
 
         nodeSelectionHover.style(e.target)
-        backgroundHoverDomNodeRef.current = e.target;
+        hoverDomNodeRef.current = e.target;
 
         // Sets absolute position for background hover.
         setBackgroundHoverStyle(createOutlineHoverStyles(e.target as HTMLElement));
@@ -99,17 +122,23 @@ const Editor: FC = () => {
     };
 
     const handleClick = (e: MouseEvent) => {
-      if (isSelecting) {
-        // Prevents elements like links from redirecting and some buttons.
-        // Doesn't seem to catch events from <svg />.
-        e.preventDefault();
+      switch (editorStatus) {
+        case SelectionEditorStatus.Selecting:
+          // Prevents elements like links from redirecting and some buttons.
+          // Doesn't seem to catch events from <svg />.
+          e.preventDefault();
 
-        nodeSelectionActive.unstyle(backgroundActiveDomNodeRef.current);
-        nodeSelectionHover.unstyle(e.target);
+          nodeSelectionActive.unstyle(activeDomNodeRef.current);
+          nodeSelectionHover.unstyle(e.target);
 
-        nodeSelectionActive.style(e.target);
-        backgroundActiveDomNodeRef.current = e.target;
-        setBackgroundActiveStyle(createOutlineHoverStyles(e.target as HTMLElement));
+          nodeSelectionActive.style(e.target);
+          activeDomNodeRef.current = e.target;
+          setBackgroundActiveStyle(createOutlineHoverStyles(e.target as HTMLElement));
+          dispatch(setEditorStatus(SelectionEditorStatus.Editing));
+          break;
+
+        case SelectionEditorStatus.Editing:
+
       }
     }
 
@@ -120,12 +149,55 @@ const Editor: FC = () => {
       document.removeEventListener('click', handleClick);
       document.removeEventListener('mouseover', handleMouseOver);
     };
-  }, [isSelecting]);
+  }, [dispatch, editorStatus]);
+
+  useEffect(() => {
+    // Attaches event listener to actual active dom node ref to only listen to
+    // mouse clicks inside this element.
+    if (activeDomNodeRef.current) {
+      const handleClick = (e: MouseEvent) => {
+        switch (editorStatus) {
+          case SelectionEditorStatus.Editing:
+            // Prevents elements like links from redirecting and some buttons.
+            // Doesn't seem to catch events from <svg />.
+            e.preventDefault();
+
+            e.stopPropagation();
+            console.log(e.target);
+            nodeSelectionActive.toggle(e.target);
+            break;
+        } 
+      };
+
+      activeDomNodeRef.current.addEventListener('click', handleClick);
+
+      return () => {
+        activeDomNodeRef.current.removeEventListener('click', handleClick);
+
+        // Also sets the ref.current value to null here as it should no longer
+        // be in use.
+        activeDomNodeRef.current = null;
+      }
+    }
+  }, [editorStatus]);
+
+  // JSX
+  const backgroundActiveJSX = editorStatus === SelectionEditorStatus.Editing && (
+    <StyledBackground style={backgroundActiveStyle}>
+      <StyledCancelButton onClick={handleCancelButonClick}>
+        Cancel
+      </StyledCancelButton>
+    </StyledBackground>
+  );
+
+  const backgroundHoverJSX = editorStatus === SelectionEditorStatus.Selecting && (
+    <StyledBackground style={backgroundHoverStyle} />
+  );
 
   return (
     <>
-      <StyledBackground style={backgroundHoverStyle} />
-      <StyledBackground style={backgroundActiveStyle} />
+      {backgroundHoverJSX}
+      {backgroundActiveJSX}
     </>
   );
 };

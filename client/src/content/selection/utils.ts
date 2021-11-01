@@ -24,6 +24,7 @@ export class NodeSelection {
   unstyle = (node) => {
     if (node?.nodeValue) {
       node.parentNode.classList.remove(this.className);
+      node.parentNode.classList.remove('speakeasy-text-delete');
     }
     if (node?.childNodes) {
       node.childNodes.forEach((childNode) => {
@@ -31,4 +32,25 @@ export class NodeSelection {
       });
     }
   };
+
+  toggle = (node) => {
+    if (node?.nodeValue) {
+      if (node.parentNode.classList.contains(this.className)) {
+        node.parentNode.classList.replace(
+          this.className,
+          'speakeasy-text-delete'
+        );
+      } else if (node.parentNode.classList.contains('speakeasy-text-delete')) {
+        node.parentNode.classList.replace(
+          'speakeasy-text-delete',
+          this.className
+        );
+      }
+    }
+    if (node?.childNodes) {
+      node.childNodes.forEach((childNode) => {
+        this.toggle(childNode)
+      });
+    }
+  }
 }
