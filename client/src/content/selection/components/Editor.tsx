@@ -14,7 +14,7 @@ import { setEditorStatus } from '../actions';
 const BORDER_RADIUS = '2px';
 
 // Enums
-import { SelectionEditorStatus } from '../enum';
+import { SelectionEditorStatus } from '../enums';
 
 // Hooks
 import { useAppDispatch, useAppSelector } from 'content/hooks';
@@ -165,6 +165,7 @@ const Editor: FC = () => {
             e.stopPropagation();
             console.log(e.target);
             nodeSelectionActive.toggle(e.target);
+            dispatch(setEditorStatus(SelectionEditorStatus.Idle))
             break;
         } 
       };
@@ -179,7 +180,7 @@ const Editor: FC = () => {
         activeDomNodeRef.current = null;
       }
     }
-  }, [editorStatus]);
+  }, [dispatch, editorStatus]);
 
   // JSX
   const backgroundActiveJSX = editorStatus === SelectionEditorStatus.Editing && (

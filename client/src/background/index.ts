@@ -10,6 +10,18 @@ chrome.runtime.onInstalled.addListener(() => {
   setUpContextMenus();
 });
 
+chrome.runtime.onMessage.addListener((message) => {
+  switch (message.type) {
+    case MessageType.SelectionEditorStatusEditing:
+    case MessageType.SelectionEditorStatusIdle:
+      setUpContextMenus();
+      break;
+    case MessageType.SelectionEditorStatusSelecting:
+      setUpSelectingContextMenus();
+      break;
+  }
+})
+
 const handleMenuItemClick = (info: chrome.contextMenus.OnClickData) => {
   chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     const [tab] = tabs;
@@ -29,13 +41,21 @@ const handleMenuItemClick = (info: chrome.contextMenus.OnClickData) => {
         chrome.tabs.sendMessage(
           tab.id,
           {
-            type: MessageType.ToggleSelectFromPage,
+            type: MessageType.SelectionEditorStatusSelecting,
           }
         );
         break;
     }
   });
 }
+
+const setUpSelectingContextMenus = () => {
+  chrome.contextMenus.create({
+    id: MenuItemId.SelectFromPage,
+    title: 'Cancel Select From Page',
+  })
+  chrome.contextMenus.onClicked.addListener(handleMenuItemClick)
+};
 
 const setUpContextMenus = () => {
   // This context menu item only appears when text is highlighted by user.

@@ -13,4 +13,7 @@ export enum MenuItemId {
 export enum MessageType {
   SynthesizeText,
   ToggleSelectFromPage,
+  SelectionEditorStatusSelecting,
+  SelectionEditorStatusIdle,
+  SelectionEditorStatusEditing,
 }

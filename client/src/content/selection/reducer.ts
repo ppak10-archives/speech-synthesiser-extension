@@ -9,7 +9,7 @@ import { createReducer } from '@reduxjs/toolkit';
 import { setEditorStatus } from './actions';
 
 // Enums
-import { SelectionEditorStatus } from './enum';
+import { SelectionEditorStatus } from './enums';
 
 const INITIAL_STATE = {
   editorStatus: SelectionEditorStatus.Idle,
