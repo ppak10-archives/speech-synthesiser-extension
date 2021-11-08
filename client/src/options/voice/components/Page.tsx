@@ -4,9 +4,8 @@
  */
 
 // Node Modules
-import { FC, useEffect, useState } from 'react';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { v4 as uuidv4 } from 'uuid';
 
 // Components
 import Modal from 'common/components/Modal';
@@ -28,7 +27,7 @@ interface StorageVoice {
 const Page: FC = () => {
   // Hooks
   const [voices, setVoices] = useState<StorageVoice>({});
-  const [voice, setVoice] = useState(VOICE);
+  const [request, setRequest] = useState(VOICE);
   const [createModalIsShown, setCreateModalIsShown] = useState(false);
 
   useEffect(() => {
@@ -49,13 +48,27 @@ const Page: FC = () => {
   }, []);
 
   // Callbacks
-  const handleCreate = () => {
-    const nextVoices = {
-      ...voices,
-      [voice.uuid]: voice,
-    };
+  const handleCreate = (
+    e: FormEvent<HTMLFormElement>,
+    voice: Voice = request,
+  ) => {
+    e.preventDefault();
+    chrome.storage.sync.set({
+      voices: {
+        ...voices,
+        [voice.uuid]: voice,
+      }
+    });
+    setCreateModalIsShown(false);
+  };
 
-    chrome.storage.sync.set({ voices: nextVoices });
+  const handleCreateFrom = (voice: Voice) => {
+    chrome.storage.sync.set({
+      voices: {
+        ...voices,
+        [voice.uuid]: voice,
+      }
+    });
   };
 
   const handleDelete = (uuid: string) => {
@@ -69,15 +82,30 @@ const Page: FC = () => {
     chrome.storage.sync.set({ voices: nextVoices });
   };
 
+  const handleUpdate = (voice: Voice) => {
+    chrome.storage.sync.set({
+      voices: {
+        ...voices,
+        [voice.uuid]: voice,
+      },
+    });
+  };
+
   // JSX
   const voicesJSX = Object.values(voices).map((voice) => (
-    <VoiceListItem voice={voice} key={voice.uuid} onDelete={handleDelete} />
+    <VoiceListItem
+      voice={voice}
+      key={voice.uuid}
+      onCreateFrom={handleCreateFrom}
+      onDelete={handleDelete}
+      onUpdate={handleUpdate}
+    />
   ));
 
   const createModalJSX = createModalIsShown && (
     <Modal>
       <button onClick={() => setCreateModalIsShown(false)}>Close</button>
-      <VoiceForm onChange={setVoice} onSubmit={handleCreate} voice={voice} />
+      <VoiceForm onChange={setRequest} onSubmit={handleCreate} voice={request} />
     </Modal>
   )
 

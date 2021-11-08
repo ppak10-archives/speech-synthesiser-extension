@@ -96,11 +96,13 @@ const Form: FC<FormProps> = ({ onChange, onSubmit, voice }) => {
           onChange={handleChange}
           placeholder="Please provide a voice title."
           type="text"
+          value={voice.title}
         />
       </fieldset>
       <fieldset>
         <legend>Voice Name</legend>
         <select name="name" onChange={handleChange} value={voice.name}>
+          <option value=''>-</option>
           {browserVoiceOptionsJSX}
         </select>
       </fieldset>
