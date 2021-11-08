@@ -5,19 +5,37 @@
 
 // Node Modules
 import {render} from 'react-dom';
+import {createGlobalStyle} from 'styled-components';
 
 // Components
 import App from './App';
 
-// Styled
-import {GlobalStyle} from 'common/styled';
+// Styled Components
+export const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0px;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  #app-root {
+    display: grid;
+    grid-template-areas: "navbar route";
+    grid-template-columns: 10em minmax(20em, 1fr);
+    height: 100vh;
+  }
+`;
 
 render(
   <>
     <GlobalStyle />
     <App />
   </>,
-  document.getElementById('root')
+  document.getElementById('app-root')
 );
 
 // let page = document.getElementById("buttonDiv");

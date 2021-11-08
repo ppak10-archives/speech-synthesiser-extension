@@ -4,45 +4,36 @@
  */
 
 // Node Modules
-import { MemoryHistory } from 'history';
 import { FC, useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
 // Styled Components
 const StyledNavbar = styled.nav`
   background-color: ${({theme}) => theme.color.primary};
-
-  ul {
-    display: flex;
-  }
+  display: flex;
+  flex-direction: column;
+  grid-area: navbar;
 `;
 
 const Navbar: FC = () => {
   // Hooks
-  const history = useHistory() as MemoryHistory;
+  const location = useLocation();
 
   useEffect(() => {
-    // Only called once as history is mutable.
-    const handleRouteChange = () => {
-      const partialMemoryHistory: Partial<MemoryHistory> = {
-        entries: history.entries,
-        index: history.index,
-      };
-
-      sessionStorage.setItem(
-        'partial_memory_history',
-        JSON.stringify(partialMemoryHistory),
-      );
-
-    };
-
-    history.listen(handleRouteChange);
-  }, [history]);
+    // Currently saves only the last visited location.
+    sessionStorage.setItem(
+      'memory_router_initial_entries',
+      JSON.stringify([location.pathname])
+    );
+  }, [location]);
 
   return (
     <StyledNavbar>
       <ul>
+        <li>
+          <Link to="/voices">Voices</Link>
+        </li>
         <li>
           <Link to="/">Home</Link>
         </li>
